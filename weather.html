@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast | Weather</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Linked External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <!-- Animated Background Container -->
+    <div id="bgAnimation" class="bg-animation"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10 w-full"> 
+        <!-- Header Section -->
+        <header class="mb-12">
+            <h1 class="text-5xl font-extrabold mb-8 bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">
+                SkyCast
+            </h1>
+
+            <div class="flex flex-col md:flex-row gap-2">
+                <div class="relative flex-1">
+                    <input 
+                        type="text" 
+                        id="cityInput" 
+                        placeholder="Enter town name (e.g. Stellenbosch)" 
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                    >
+                    <i data-lucide="search" class="absolute right-4 top-4 text-zinc-600"></i>
+                </div>
+                <button 
+                    onclick="handleSearch()" 
+                    class="bg-white text-black hover:bg-zinc-200 px-8 py-4 rounded-xl font-bold transition-all active:scale-95"
+                >
+                    Search
+                </button>
+            </div>
+
+            <div id="savedTowns" class="mt-4 flex flex-wrap gap-2"></div>
+        </header>
+
+        <!-- Loading State -->
+        <div id="loading" class="hidden flex justify-center py-20">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Main Weather Content -->
+        <main id="weatherContent" class="hidden w-full">
+            <div class="glass-card p-8 animate-weather">
+                
+                <!-- Location Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-10">
+                    <div>
+                        <h2 id="locationName" class="text-4xl font-bold">---</h2>
+                        <p id="countryName" class="text-zinc-500 mt-1 flex items-center gap-1">
+                            <i data-lucide="map-pin" size="16"></i> ---
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button 
+                            id="favBtn"
+                            onclick="toggleFavorite()" 
+                            class="bg-zinc-900 p-3 rounded-full hover:scale-110 transition-transform border border-zinc-800"
+                        >
+                            <i data-lucide="heart" id="heartIcon"></i>
+                        </button>
+                        <button 
+                            id="defaultBtn"
+                            onclick="toggleDefault()" 
+                            class="bg-zinc-900 p-3 rounded-full hover:scale-110 transition-transform border border-zinc-800"
+                        >
+                            <i data-lucide="star" id="starIcon"></i>
+                        </button>
+                        <button 
+                            onclick="toggleBackground()" 
+                            class="bg-zinc-900 p-3 rounded-full hover:scale-110 transition-transform border border-zinc-800"
+                            title="Toggle Background Animation"
+                        >
+                            <i data-lucide="eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECTION 1: NOW -->
+                <div class="mb-8">
+                    <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Now</h3>
+                    
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                        <div>
+                            <span id="currentTemp" class="text-9xl font-black tracking-tighter">--°C</span>
+                            <p class="text-zinc-500 text-sm mt-2">Current Temperature</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right">
+                            <div class="md:col-span-1 pr-0 md:pr-4 md:border-r md:border-zinc-800">
+                                <p class="text-white text-xl font-semibold"><span id="highTemp">--</span>°/<span id="lowTemp">--</span>°</p>
+                                <p class="text-zinc-500 text-xs mt-1">High / Low</p>
+                            </div>
+                            <div class="md:col-span-1">
+                                <p class="text-white text-xl font-semibold">Rain: <span id="rainAmount">0</span>mm</p>
+                                <p class="text-zinc-500 text-xs mt-1">Precipitation</p>
+                            </div>
+                            <div class="md:col-span-1">
+                                <p class="text-white text-xl font-semibold"><span id="windSpeed">--</span> km/h</p>
+                                <p class="text-zinc-500 text-xs mt-1">Wind Speed</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 p-4 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+                        <div class="text-center">
+                            <p class="text-zinc-500 text-xs uppercase mb-1">UV Index</p>
+                            <span id="uvIndex" class="text-xl font-bold text-white">--</span>
+                        </div>
+                        <div class="text-center border-x border-zinc-800">
+                            <p class="text-zinc-500 text-xs uppercase mb-1">Sunrise</p>
+                            <span id="sunrise" class="text-lg font-semibold">--:--</span>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-zinc-500 text-xs uppercase mb-1">Sunset</p>
+                            <span id="sunset" class="text-lg font-semibold">--:--</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="border-t border-zinc-800 my-8"></div>
+
+                <!-- SECTION 2: HOURLY FORECAST -->
+                <div class="mb-8">
+                    <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Hourly Forecast - (Use scroll wheel)</h3> 
+                    <div id="hourlyGrid" class="flex gap-3 overflow-x-auto pb-4 hide-scrollbar cursor-grab active:cursor-grabbing"></div>
+                </div>
+
+                <div class="border-t border-zinc-800 my-8"></div>
+
+                <!-- SECTION 3: WEEKLY FORECAST -->
+                <div>
+                    <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Next 7 Days</h3>
+                    <div id="weeklyGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 w-full"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-20 text-zinc-600">
+            Search for a town to see the forecast.
+        </div>
+    </div>
+
+    <!-- Linked External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
