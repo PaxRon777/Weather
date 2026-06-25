@@ -2,6 +2,8 @@
 
 SkyCast is a sleek, high-performance weather dashboard designed with a focus on minimalist aesthetics and smooth user experience. It provides real-time weather data, hourly forecasts, and weekly outlooks using a modern "Glassmorphism" design language.
 
+![Alt Text](screenshot.png)
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
